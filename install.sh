@@ -42,3 +42,7 @@ ca_hash=`openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubi
 for n in $W_NODES; do
 	ssh $n "sudo kubeadm join 10.10.2.1:6443 --token $generate_token --discovery-token-ca-cert-hash sha256:$ca_hash"
 done
+
+sleep 2
+echo "applying calico network"
+kubectl apply -f calico.yaml

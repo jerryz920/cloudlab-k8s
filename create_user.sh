@@ -23,7 +23,8 @@ gen_cert() {
 	#/O defines group, /CN defines username, K8s convention
 openssl req -new -key $1.key -out $1.csr -subj "/O=users/CN=$1" #-config $SCRIPT_DIR/openssl.cnf 
 echo openssl x509 -req -days 1000 -in $1.csr -CA $2.crt -CAkey $2.key -set_serial 0101 -out $1.crt -sha256 -extensions 'v3_req' #-extfile $SCRIPT_DIR/openssl.cnf 
-openssl x509 -req -days 1000 -in $1.csr -CA $2.crt -CAkey $2.key -set_serial 0101 -out $1.crt -sha256 -extensions 'v3_req' #-extfile $SCRIPT_DIR/openssl.cnf 
+sudo openssl x509 -req -days 1000 -in $1.csr -CA $2.crt -CAkey $2.key -set_serial 0101 -out $1.crt -sha256 -extensions 'v3_req' #-extfile $SCRIPT_DIR/openssl.cnf 
+sudo chown $USER:$GROUP $1.crt
 }
 
 wrap_config() {
