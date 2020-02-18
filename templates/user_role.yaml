@@ -1,0 +1,64 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: listpods-USERNAME
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods"]
+  verbs: ["list"]
+- nonResourceURLs: ["/healthz", "/healthz/*"] # '*' in a nonResourceURL is a suffix glob match
+  verbs: ["get", "post"]
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: latte-USERNAME
+  name: namespace_admin_USERNAME
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods","services","endpoints","configmaps"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["extensions", "apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  namespace: latte-USERNAME
+  name: latte-admin-USERNAME
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: listpods-binding-USERNAME
+subjects:
+- kind: Group
+  name: users # Name is case sensitive
+  apiGroup: rbac.authorization.k8s.io
+- kind: ServiceAccount
+  name: latte-admin-USERNAME
+  namespace: latte-USERNAME
+roleRef:
+  kind: ClusterRole #this must be Role or ClusterRole
+  name: listpods-USERNAME # this must match the name of the Role or ClusterRole you wish to bind to
+  apiGroup: rbac.authorization.k8s.io
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: USERNAME_namespace_binding
+  namespace: latte-USERNAME
+subjects:
+- kind: User
+  name: USERNAME # Name is case sensitive
+  apiGroup: rbac.authorization.k8s.io
+- kind: ServiceAccount
+  name: latte-admin-USERNAME
+  namespace: latte-USERNAME
+roleRef:
+  kind: Role #this must be Role or ClusterRole
+  name: namespace_admin_USERNAME
+  apiGroup: rbac.authorization.k8s.io
+
+

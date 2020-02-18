@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Config
+preferences: {}
+
+clusters:
+- cluster:
+  name: kubernetes
+
+users:
+- name: USERNAME
+
+contexts:
+- context:
+  name: latte
