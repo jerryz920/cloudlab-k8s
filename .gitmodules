@@ -6,3 +6,7 @@
 	path = hadoop
 	url = https://github.com/jerryz920/hadoop
 	branch = tapcon
+[submodule "spark"]
+	path = spark
+	url = https://github.com/jerryz920/spark
+	branch = latte-k8s
