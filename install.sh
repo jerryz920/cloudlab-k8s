@@ -32,9 +32,11 @@ sudo cp -f -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 # For safety
-sudo iptables -A INPUT -d 10.10.1.1 --dport 6443 -j ACCEPT
-sudo iptables -A INPUT -d 10.10.2.1 --dport 6443 -j ACCEPT
-sudo iptables -A INPUT --dport 6443 -j DROP
+sudo iptables -N security
+sudo iptables -I INPUT -j security
+sudo iptables -A security -d 10.10.1.1 -p tcp --dport 6443 -j ACCEPT
+sudo iptables -A security -d 10.10.2.1 -p tcp --dport 6443 -j ACCEPT
+sudo iptables -A security -p tcp --dport 6443 -j DROP
 
 generate_token=`sudo kubeadm token create`
 ca_hash=`openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'`

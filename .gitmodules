@@ -2,3 +2,7 @@
 	path = kubernetes
 	url = https://github.com/jerryz920/kubernetes
 	branch = tapcon
+[submodule "hadoop"]
+	path = hadoop
+	url = https://github.com/jerryz920/hadoop
+	branch = tapcon
