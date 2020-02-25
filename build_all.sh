@@ -42,10 +42,11 @@ wload spark:v2.3 spark
 (
 echo "Building Latte Proxy"
 cd proxy
+make
 )
 
 (
-echo "Building Safe"
-cd safe
+echo "Building Riak Image"
+cd riak-image
+docker build -t riak .
 )
-
