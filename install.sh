@@ -13,7 +13,7 @@ sudo apt-get install -y jq
 vlan_info=`sudo bash check_link.sh  | head -n 1`
 vlan_id=`echo $vlan_info | awk '{print $1}'`
 
-bash allcp.sh check_link.sh /tmp/
+bash allcp.sh helpers/check_link.sh /tmp/
 bash allrun.sh "sudo bash check_link.sh | grep $vlan_id | awk '{print \$2}' > vlan_dev"
 
 start=1
@@ -22,8 +22,8 @@ for n in $ALL_NODES; do
 	start=$((start+1))
 done
 
-bash allcp.sh daemon.json
-bash allrun.sh "sudo mkdir -p /etc/docker/; sudo cp daemon.json /etc/docker/; sudo systemctl restart docker"
+bash allcp.sh configs/daemon.json
+bash allrun.sh "sudo mkdir -p /etc/docker/; sudo cp daemon.json /etc/docker/; sudo systemctl restart docker; sudo gpasswd -a $USER docker;"
 
 # Cluster admin credential
 sudo kubeadm init --apiserver-advertise-address 10.10.1.1 --pod-network-cidr=192.168.0.0/16 
@@ -47,4 +47,4 @@ done
 
 sleep 2
 echo "applying calico network"
-kubectl apply -f calico.yaml
+kubectl apply -f configs/calico.yaml

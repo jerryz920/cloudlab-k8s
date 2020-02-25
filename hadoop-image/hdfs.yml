@@ -1,0 +1,132 @@
+apiVersion: v1
+kind: Pod # using pod is just a workaround for evaluation. Need better use of distributed persistent volume solution...
+metadata:
+  name: namenode
+  labels:
+    app: hdfs-namenode
+spec:
+  containers:
+    - name: namenode
+      image: uhopper/hadoop-namenode
+      imagePullPolicy: IfNotPresent
+      volumeMounts:
+      - mountPath: /hadoop/dfs/name
+        name: hdfs-name-volume
+      env:
+      - name: CLUSTER_NAME
+        value: k8s-hdfs
+ #     - name: HDFS_CONF_dfs_namenode_datanode_registration_ip___hostname___check
+ #       value: false
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - worker-1
+  volumes:
+  - name: hdfs-name-volume
+    hostPath:
+      # directory location on host
+      path: /hdfs-name
+      # this field is optional
+      type: Directory
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: namenode
+  labels:
+    app: hdfs-namenode
+spec:
+  ports:
+  - port: 8020
+    name: hdfs
+    protocol: TCP
+  - port: 9000
+    name: hdfs-alt
+    protocol: TCP
+  - port: 50070
+    name: webfs
+    protocol: TCP
+  - port: 50470
+    name: webfs-https
+    protocol: TCP
+  - port: 50090
+    name: sec-hdfs
+    protocol: TCP
+  selector:
+    app: hdfs-namenode
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: datanode
+  labels:
+    app: hdfs-datanode
+spec:
+  clusterIP: None
+  ports:
+  - port: 50075
+    name: hdfs
+    protocol: TCP
+  - port: 50475
+    name: hdfs-alt
+    protocol: TCP
+  - port: 50010
+    name: data
+    protocol: TCP
+  - port: 50020
+    name: ipc
+    protocol: TCP
+  selector:
+    app: hdfs-datanode
+
+---
+apiVersion: apps/v1 # For Kubernetes version 1.9 and later, use apps/v1
+kind: StatefulSet
+metadata:
+  name: datanode
+  labels:
+    app: hdfs-datanode
+spec:
+  selector:
+      matchLabels:
+        app: hdfs-datanode # Label selector that determines which Pods belong to the DaemonSet
+  podManagementPolicy: "Parallel"
+  serviceName: "datanode"
+  replicas: 5
+  template:
+    metadata:
+      labels:
+        app: hdfs-datanode # Pod template's label selector
+    spec:
+      containers:
+      - name: datanode
+        image: uhopper/hadoop-datanode
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - mountPath: /hadoop/dfs/data
+            name: hdfs-data-volume
+        env:
+        - name: CORE_CONF_fs_defaultFS
+          value: hdfs://namenode:8020
+      volumes:
+        - name: hdfs-data-volume
+          hostPath:
+            path: /hdfs-data
+            type: Directory
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app: hdfs-datanode
+            topologyKey: "kubernetes.io/hostname"
+
+
+  
+  

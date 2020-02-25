@@ -1,0 +1,1 @@
+do not call hdfs cmd on namenode container, it will just screw you... Use an extra container to do so but remember reset the namenode in /opt/xxxx
