@@ -2,19 +2,16 @@ source ./env.sh
 sudo apt-get -y update
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
 sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
-bash allrun.sh "sudo apt-get update; curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add; sudo apt-add-repository 'deb http://apt.kubernetes.io/ kubernetes-xenial main'; sudo apt-get update; sudo apt-get install -y kubelet"
-sudo apt-get install -y kubeadm
+bash allrun.sh "sudo apt-get update; curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add; sudo apt-add-repository 'deb http://apt.kubernetes.io/ kubernetes-xenial main'; sudo apt-get update; sudo apt-get install -y kubelet kubeadm"
 
-bash allrun.sh "sudo apt-get install -y lldpd"
-
-sudo apt-get install -y jq
+bash allrun.sh "sudo apt-get install -y lldpd jq"
 
 
-vlan_info=`sudo bash check_link.sh  | head -n 1`
-vlan_id=`echo $vlan_info | awk '{print $1}'`
+net_info=`sudo bash helpers/check_link.sh  | head -n 1`
+net_id=`echo $net_info | awk '{print $1}'`
 
 bash allcp.sh helpers/check_link.sh /tmp/
-bash allrun.sh "sudo bash check_link.sh | grep $vlan_id | awk '{print \$2}' > vlan_dev"
+bash allrun.sh "sudo bash /tmp/check_link.sh | grep $net_id | awk '{print \$2}' > vlan_dev"
 
 start=1
 for n in $ALL_NODES; do
@@ -28,7 +25,7 @@ bash allrun.sh "sudo mkdir -p /etc/docker/; sudo cp daemon.json /etc/docker/; su
 # Cluster admin credential
 sudo kubeadm init --apiserver-advertise-address 10.10.1.1 --pod-network-cidr=192.168.0.0/16 
 mkdir -p $HOME/.kube
-sudo cp -f -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 # For safety
