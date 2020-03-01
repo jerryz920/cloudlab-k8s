@@ -39,9 +39,36 @@ generate_token=`sudo kubeadm token create`
 ca_hash=`openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'`
 
 for n in $W_NODES; do
-	ssh $n "sudo kubeadm join 10.10.2.1:6443 --token $generate_token --discovery-token-ca-cert-hash sha256:$ca_hash"
+	ssh $n "sudo kubeadm join 10.10.1.1:6443 --token $generate_token --discovery-token-ca-cert-hash sha256:$ca_hash"
 done
 
 sleep 2
 echo "applying calico network"
 kubectl apply -f configs/calico.yaml
+
+pushd .
+
+# Installing Golang for building things later
+cd /openstack/
+sudo wget https://dl.google.com/go/go1.13.8.linux-amd64.tar.gz -O gobinary.tar.gz
+sudo apt-get install -y cmake
+
+sudo rm -rf goroot
+sudo mkdir -p goroot
+sudo tar xf gobinary.tar.gz -Cgoroot
+sudo mkdir -p go
+sudo chown $USER:`id -g -n` go
+sudo ln -s /openstack/goroot/go/ ~/goroot
+sudo ln -s /openstack/go/ ~/go
+
+echo "export GOROOT=~/goroot" >> ~/.bashrc
+echo "export GOPATH=~/go" >> ~/.bashrc
+echo "export PATH=\$PATH:/.local/bin:\$PATH:\$GOROOT/bin/:\$GOPATH/bin/" >> ~/.bashrc
+
+export GOROOT=~/goroot
+export GOPATH=~/go
+export PATH=$PATH:$GOROOT/bin/:$GOPATH/bin/
+
+
+
+
