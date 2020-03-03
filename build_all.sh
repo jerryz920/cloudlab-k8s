@@ -1,3 +1,13 @@
+
+confirm() {
+	echo $1
+	read input
+	if [[ $input != "y" ]]; then
+		exit 0
+	fi
+}
+
+
 (
 echo "Building K8s"
 cd kubernetes
@@ -10,14 +20,14 @@ fi
 make quick-release
 # We can do make package later for faster rebuild. But now we need quick-release to get everything done
 #KUBE_FASTBUILD=true make package
-docker image rm kube-apiserver
+echo docker image rm kube-apiserver
 tag=`hack/print-workspace-status.sh | grep DOCKER_TAG | awk '{print $2}'`
 # Delete first then reload
-docker image rm k8s.gcr.io/kube-apiserver-amd64:$tag
-docker image rm k8s.gcr.io/kube-apiserver:$tag
-docker image load -i _output/release-images/amd64/kube-apiserver.tar
-bash wcp.sh _output/release-images/amd64/kube-apiserver.tar
-bash wrun.sh "docker image load -i kube-apiserver.tar;"
+echo docker image rm k8s.gcr.io/kube-apiserver-amd64:$tag
+echo docker image rm k8s.gcr.io/kube-apiserver:$tag
+echo docker image load -i _output/release-images/amd64/kube-apiserver.tar
+echo bash wcp.sh _output/release-images/amd64/kube-apiserver.tar
+echo bash wrun.sh "docker image load -i kube-apiserver.tar;"
 
 # edit kubelet config to reload
 sed -i 's/image: .\+/image: k8s.gcr.io\/kube-apiserver-amd64:'$tag'/' /etc/kubernetes/manifests/kube-apiserver.yaml
@@ -25,15 +35,17 @@ sed -i 's/image: .\+/image: k8s.gcr.io\/kube-apiserver-amd64:'$tag'/' /etc/kuber
 # wait for api server to reload.
 sleep 5
 
-bash wrun.sh "sudo systemctl stop kubelet;"
+echo bash wrun.sh "sudo systemctl stop kubelet;"
 for n in kubelet kubeadm kubectl; do
   make -j $n
-  bash wcp.sh _output/bin/$n
-  bash wrun.sh "sudo cp $n /usr/bin/"
+  echo bash wcp.sh _output/bin/$n
+  echo bash wrun.sh "sudo cp $n /usr/bin/"
 done
-bash wrun.sh "sudo systemctl start kubelet;"
+echo bash wrun.sh "sudo systemctl start kubelet;"
 
 )
+
+#confirm "k8s built, continue?"
 
 (
 echo "Building Hdfs"
@@ -41,11 +53,13 @@ cd hadoop
 bash docker-build.sh
 )
 
+confirm "hdfs built , continue?"
 (
 echo "Building Hdfs-Docker-Images"
 cd hadoop-image
 bash buildhdfs.sh
 )
+confirm "hdfs docker built , continue?"
 
 (
 echo "Building Spark and Spark Docker Images"
@@ -53,6 +67,7 @@ cd spark
 dev/make-distribution.sh --tgz --name safe-spark -Phadoop-2.7 -Dscala-2.11
 bin/docker-image-tool.sh -t v2.3 build
 )
+confirm "spark built , continue?"
 
 (
 # There is no simple way of setting up docker repository, so we load them on
@@ -61,7 +76,7 @@ echo "Loading Docker Images"
 wload() {
   docker image save $1 > $2.tar
   bash wcp.sh $2.tar
-  bash wrun.sh "docker image rm $2; docker image load -i $2.tar; rm -r $2.tar"
+  bash wrun.sh "docker image rm $1; docker image load -i $2.tar; rm -r $2.tar"
   rm $2.tar
 }
 

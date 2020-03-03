@@ -57,7 +57,7 @@ sudo rm -rf goroot
 sudo mkdir -p goroot
 sudo tar xf gobinary.tar.gz -Cgoroot
 sudo mkdir -p go
-sudo chown $USER:`id -g -n` go
+sudo chown -R $USER:`id -g -n` go
 sudo ln -s /openstack/goroot/go/ ~/goroot
 sudo ln -s /openstack/go/ ~/go
 
