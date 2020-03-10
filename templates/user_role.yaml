@@ -19,7 +19,7 @@ rules:
   resources: ["pods","services","endpoints","configmaps"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 - apiGroups: ["extensions", "apps"]
-  resources: ["deployments"]
+  resources: ["deployments", "statefulset"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 ---
 kind: ServiceAccount
