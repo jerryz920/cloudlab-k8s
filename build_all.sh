@@ -87,7 +87,7 @@ confirm "spark built , continue?"
 echo "Building Shield Pod"
 cd shield
 docker build -t shield .
-
+sudo bash create-creds.sh
 )
 
 (

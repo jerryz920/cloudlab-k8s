@@ -1,0 +1,3 @@
+
+
+curl https://hdfs-shield:20000/upload --cacert ca.crt --cert <k8s user cert> --key <k8s user private key> -F file=@data-file -F filename=string -F tagname=string -X PUT
