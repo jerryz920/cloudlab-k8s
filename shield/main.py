@@ -10,7 +10,7 @@ import os
 
 app=create(__name__)
 myid=None
-hdfs_url=os.environ.get("HDFS_URL", "http://hdfs-1.latte.org:50070")
+hdfs_url=os.environ.get("HDFS_URL", "http://namenode:50070")
 safe_url=os.environ.get("MDS_URL", "http://mds:19851")
 ca_cert = os.environ.get("CA_CERT", "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")
 cert = os.environ.get("TLS_CERT", "/opt/creds/server.crt")
