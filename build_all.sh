@@ -6,6 +6,7 @@ confirm() {
 		exit 0
 	fi
 }
+sudo chown -R $USER:`id -g -n` ~/.m2
 
 
 (
@@ -58,6 +59,10 @@ confirm "hdfs built , continue?"
 echo "Building Hdfs-Docker-Images"
 cd hadoop-image
 bash buildhdfs.sh
+
+# setup the necessary temporary directory for Hadoop data/name node
+bash allrun.sh "sudo mkdir -p /openstac/hdfs-name /openstack/hdfs-data; sudo ln -s /openstack/hdfs-name /hdfs-name; sudo ln -s /openstack/hdfs-data /hdfs-data;"
+
 )
 confirm "hdfs docker built , continue?"
 
