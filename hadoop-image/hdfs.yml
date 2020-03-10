@@ -22,15 +22,15 @@ spec:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
         - matchExpressions:
-          - key: kubernetes.io/hostname
+          - key: nodetype
             operator: In
             values:
-            - worker-1
+            - worker-0
   volumes:
   - name: hdfs-name-volume
     hostPath:
       # directory location on host
-      path: /hdfs-name
+      path: /openstack/hdfs-name
       # this field is optional
       type: Directory
 ---
@@ -98,7 +98,7 @@ spec:
         app: hdfs-datanode # Label selector that determines which Pods belong to the DaemonSet
   podManagementPolicy: "Parallel"
   serviceName: "datanode"
-  replicas: 5
+  replicas: 3
   template:
     metadata:
       labels:
@@ -117,7 +117,7 @@ spec:
       volumes:
         - name: hdfs-data-volume
           hostPath:
-            path: /hdfs-data
+            path: /openstack/hdfs-data
             type: Directory
       affinity:
         podAntiAffinity:

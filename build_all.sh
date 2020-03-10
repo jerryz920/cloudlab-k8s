@@ -61,7 +61,7 @@ cd hadoop-image
 bash buildhdfs.sh
 
 # setup the necessary temporary directory for Hadoop data/name node
-bash allrun.sh "sudo mkdir -p /openstac/hdfs-name /openstack/hdfs-data; sudo ln -s /openstack/hdfs-name /hdfs-name; sudo ln -s /openstack/hdfs-data /hdfs-data;"
+bash allrun.sh "sudo mkdir -p /openstack/hdfs-name /openstack/hdfs-data;"
 
 )
 confirm "hdfs docker built , continue?"
