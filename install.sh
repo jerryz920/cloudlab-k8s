@@ -80,4 +80,10 @@ for node in `bash wrun.sh hostname | dos2unix`; do
 done
 kubectl label node `hostname | dos2unix`  nodetype=master --overwrite
 
+# installing a systemd service for http file upload
+# intentionally to be read only by root. Drop jar files to /openstack/files
+sudo mkdir /openstack/files/
+sudo cp configs/http-file.service /etc/systemd/system
+sudo systemctl daemon-reload
+sudo systemctl start http-file
 

@@ -1,0 +1,16 @@
+[Unit]
+Description=Simple HTTP interface file service
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/openstack/files
+ExecStart=/usr/bin/python3 -m http.server --bind 192.168.0.1 12345
+ExecReload=/bin/kill -USR1 $MAINPID
+Restart=always
+User=nobody
+Group=nogroup
+# iperf in some case can bug out and run forever. In this case SIGTERM is not useful in shutting
+# it down. It needs sigkill
+KillSignal=SIGKILL
+

@@ -84,6 +84,13 @@ kubectl create -f configs/spark.yml
 confirm "spark built , continue?"
 
 (
+echo "Building Shield Pod"
+cd shield
+docker build -t shield .
+
+)
+
+(
 # There is no simple way of setting up docker repository, so we load them on
 # every node.
 echo "Loading Docker Images"
@@ -97,6 +104,7 @@ wload() {
 wload uhopper/hadoop-datanode dn
 wload uhopper/hadoop-namenode nn
 wload spark:v2.3 spark
+wload shield shield
 )
 
 (
@@ -110,3 +118,4 @@ echo "Building Riak Image"
 cd riak-image
 docker build -t riak .
 )
+
