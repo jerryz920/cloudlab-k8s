@@ -1,5 +1,6 @@
 source ./env.sh
 sudo apt-get -y update
+sudo apt-get install -y dos2unix
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
 sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
 bash allrun.sh "sudo apt-get update; curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add; sudo apt-add-repository 'deb http://apt.kubernetes.io/ kubernetes-xenial main'; sudo apt-get update; sudo apt-get install -y kubelet kubeadm"
@@ -70,5 +71,13 @@ export GOPATH=~/go
 export PATH=$PATH:$GOROOT/bin/:$GOPATH/bin/
 
 
+# label nodes to prepare hdfs running
+index=0
+for node in `bash wrun.sh hostname | dos2unix`; do
+  echo "Labeling node $node"
+  kubectl label node $node nodetype=worker-$index --overwrite
+  index=$((index+1))
+done
+kubectl label node `hostname | dos2unix`  nodetype=master --overwrite
 
 
