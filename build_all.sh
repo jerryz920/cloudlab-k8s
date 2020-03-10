@@ -62,7 +62,13 @@ bash buildhdfs.sh
 
 # setup the necessary temporary directory for Hadoop data/name node
 bash allrun.sh "sudo mkdir -p /openstack/hdfs-name /openstack/hdfs-data;"
+cd ../
 
+echo "Relaunching HDFS cluster"
+# remove old first if exists
+kubectl delete -f configs/hdfs.yml
+sleep 5
+kubectl create -f configs/hdfs.yml
 )
 confirm "hdfs docker built , continue?"
 
@@ -71,6 +77,9 @@ echo "Building Spark and Spark Docker Images"
 cd spark
 dev/make-distribution.sh --tgz --name safe-spark -Phadoop-2.7 -Dscala-2.11
 bin/docker-image-tool.sh -t v2.3 build
+
+echo "Provision Spark Cluster Credentials"
+kubectl create -f configs/spark.yml
 )
 confirm "spark built , continue?"
 

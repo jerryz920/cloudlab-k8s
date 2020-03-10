@@ -1,0 +1,30 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: spark
+  name: spark-role
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods", "services", "configmap"]
+  verbs: ["list", "create", "edit", "get", "watch","delete"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: spark
+  namespace: spark
+automountServiceAccountToken: true
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: spark-role-binding
+  namespace: spark
+subjects:
+- kind: ServiceAccount
+  name: spark # Name is case sensitive
+  namespace: spark
+roleRef:
+  kind: Role #this must be Role or ClusterRole
+  name: spark-role # this must match the name of the Role or ClusterRole you wish to bind to
+  apiGroup: rbac.authorization.k8s.io
