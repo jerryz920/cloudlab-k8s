@@ -24,7 +24,7 @@ bash allcp.sh configs/daemon.json
 bash allrun.sh "sudo mkdir -p /etc/docker/; sudo cp daemon.json /etc/docker/; sudo systemctl restart docker; sudo gpasswd -a $USER docker;"
 
 # Cluster admin credential
-sudo kubeadm init --apiserver-advertise-address 10.10.1.1 --pod-network-cidr=192.168.0.0/16 
+sudo kubeadm init --apiserver-advertise-address 10.10.1.1 --pod-network-cidr=192.168.128.0/16 
 mkdir -p $HOME/.kube
 sudo cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
@@ -35,13 +35,10 @@ sudo iptables -I INPUT -j security
 sudo iptables -A security -d 10.10.1.1 -p tcp --dport 6443 -j ACCEPT
 sudo iptables -A security -d 10.10.2.1 -p tcp --dport 6443 -j ACCEPT
 sudo iptables -A security -p tcp --dport 6443 -j DROP
-
+#
 generate_token=`sudo kubeadm token create`
 ca_hash=`openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'`
-
-for n in $W_NODES; do
-	ssh $n "sudo kubeadm join 10.10.1.1:6443 --token $generate_token --discovery-token-ca-cert-hash sha256:$ca_hash"
-done
+bash wrun.sh "sudo kubeadm join 10.10.1.1:6443 --token $generate_token --discovery-token-ca-cert-hash sha256:$ca_hash"
 
 sleep 2
 echo "applying calico network"
