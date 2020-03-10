@@ -29,8 +29,10 @@ data:
           "nodename": "__KUBERNETES_NODE_NAME__",
           "mtu": __CNI_MTU__,
           "ipam": {
-              "type": "calico-ipam"
-          },
+            "type": "host-local",
+            "subnet": "usePodCidr"
+            },
+
           "policy": {
               "type": "k8s"
           },
@@ -40,7 +42,7 @@ data:
         },
         {
           "type": "portmap",
-          "snat": true,
+          "snat": false,
           "capabilities": {"portMappings": true}
         }
       ]
@@ -623,7 +625,7 @@ spec:
             # chosen from this range. Changing this value after installation will have
             # no effect. This should fall within `--cluster-cidr`.
             - name: CALICO_IPV4POOL_CIDR
-              value: "192.168.0.0/16"
+              value: "192.168.128.0/16"
             # Disable file logging so `kubectl logs` works.
             - name: CALICO_DISABLE_FILE_LOGGING
               value: "true"
