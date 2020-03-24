@@ -35,14 +35,15 @@ sudo sed -i 's/image: .\+/image: k8s.gcr.io\/kube-apiserver-amd64:'$tag'/' /etc/
 
 # wait for api server to reload.
 sleep 5
+cd ..
 
-bash wrun.sh "sudo systemctl stop kubelet;"
+bash allrun.sh "sudo systemctl stop kubelet;"
 for n in kubelet kubeadm kubectl; do
-  make -j $n
-  bash wcp.sh _output/bin/$n
-  bash wrun.sh "sudo cp $n /usr/bin/"
+  make -j $n -C kubernetes
+  bash allcp.sh kubernetes/_output/bin/$n
+  bash allrun.sh "sudo cp $n /usr/bin/"
 done
-bash wrun.sh "sudo systemctl start kubelet;"
+bash allrun.sh "sudo systemctl start kubelet;"
 
 )
 
