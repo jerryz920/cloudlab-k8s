@@ -1,10 +1,10 @@
 
 confirm() {
 	echo $1
-	read input
-	if [[ $input != "y" ]]; then
-		exit 0
-	fi
+	#read input
+	#if [[ $input != "y" ]]; then
+	#	exit 0
+	#fi
 }
 sudo chown -R $USER:`id -g -n` ~/.m2
 
@@ -31,7 +31,7 @@ echo bash wcp.sh _output/release-images/amd64/kube-apiserver.tar
 echo bash wrun.sh "docker image load -i kube-apiserver.tar;"
 
 # edit kubelet config to reload
-sed -i 's/image: .\+/image: k8s.gcr.io\/kube-apiserver-amd64:'$tag'/' /etc/kubernetes/manifests/kube-apiserver.yaml
+sudo sed -i 's/image: .\+/image: k8s.gcr.io\/kube-apiserver-amd64:'$tag'/' /etc/kubernetes/manifests/kube-apiserver.yaml
 
 # wait for api server to reload.
 sleep 5
