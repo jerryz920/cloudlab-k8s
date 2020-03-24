@@ -1,10 +1,10 @@
 
 confirm() {
 	echo $1
-	#read input
-	#if [[ $input != "y" ]]; then
-	#	exit 0
-	#fi
+	read input
+	if [[ $input != "y" ]]; then
+		exit 0
+	fi
 }
 sudo chown -R $USER:`id -g -n` ~/.m2
 
@@ -21,14 +21,14 @@ fi
 make quick-release
 # We can do make package later for faster rebuild. But now we need quick-release to get everything done
 #KUBE_FASTBUILD=true make package
-echo docker image rm kube-apiserver
+docker image rm kube-apiserver
 tag=`hack/print-workspace-status.sh | grep DOCKER_TAG | awk '{print $2}'`
 # Delete first then reload
-echo docker image rm k8s.gcr.io/kube-apiserver-amd64:$tag
-echo docker image rm k8s.gcr.io/kube-apiserver:$tag
-echo docker image load -i _output/release-images/amd64/kube-apiserver.tar
-echo bash wcp.sh _output/release-images/amd64/kube-apiserver.tar
-echo bash wrun.sh "docker image load -i kube-apiserver.tar;"
+docker image rm k8s.gcr.io/kube-apiserver-amd64:$tag
+docker image rm k8s.gcr.io/kube-apiserver:$tag
+docker image load -i _output/release-images/amd64/kube-apiserver.tar
+#bash wcp.sh _output/release-images/amd64/kube-apiserver.tar
+#bash wrun.sh "docker image load -i kube-apiserver.tar;"
 
 # edit kubelet config to reload
 sudo sed -i 's/image: .\+/image: k8s.gcr.io\/kube-apiserver-amd64:'$tag'/' /etc/kubernetes/manifests/kube-apiserver.yaml
@@ -36,17 +36,17 @@ sudo sed -i 's/image: .\+/image: k8s.gcr.io\/kube-apiserver-amd64:'$tag'/' /etc/
 # wait for api server to reload.
 sleep 5
 
-echo bash wrun.sh "sudo systemctl stop kubelet;"
+bash wrun.sh "sudo systemctl stop kubelet;"
 for n in kubelet kubeadm kubectl; do
   make -j $n
-  echo bash wcp.sh _output/bin/$n
-  echo bash wrun.sh "sudo cp $n /usr/bin/"
+  bash wcp.sh _output/bin/$n
+  bash wrun.sh "sudo cp $n /usr/bin/"
 done
-echo bash wrun.sh "sudo systemctl start kubelet;"
+bash wrun.sh "sudo systemctl start kubelet;"
 
 )
 
-#confirm "k8s built, continue?"
+confirm "k8s built, continue?"
 
 (
 echo "Building Hdfs"
