@@ -66,6 +66,8 @@ for n in $NODES; do
   echo "$node_ip0 ${n}-ilink ${n}-0 ${n}" >> /etc/hosts
   echo "$node_ip1 ${n}-elink ${n}-1" >> /etc/hosts
 done
+  echo "192.168.0.1 mds" >> /etc/hosts
+
 }
 
 # make sure env.sh has been sourced before call this
