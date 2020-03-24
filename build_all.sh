@@ -118,5 +118,6 @@ make
 echo "Building Riak Image"
 cd riak-image
 docker build -t riak .
+docker run -t --rm -d -p 8098:8098 -p 8087:8087 --name riak riak
 )
 
