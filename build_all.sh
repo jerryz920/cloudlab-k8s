@@ -32,6 +32,7 @@ docker image load -i _output/release-images/amd64/kube-apiserver.tar
 
 # edit kubelet config to reload
 sudo sed -i 's/image: .\+/image: k8s.gcr.io\/kube-apiserver-amd64:'$tag'/' /etc/kubernetes/manifests/kube-apiserver.yaml
+sudo sed -i -e '$a# Build hack force restart' /etc/kubernetes/manifests/kube-apiserver.yaml
 
 # wait for api server to reload.
 sleep 5

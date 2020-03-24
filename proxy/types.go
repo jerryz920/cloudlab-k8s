@@ -30,11 +30,12 @@ type MetadataRequest struct {
 	rport int
 
 	// Used to carry some intermediate information
-	targetCidr  *net.IPNet
-	targetIp    net.IP
-	targetLport int
-	targetRport int
-	targetType  string
+	targetCidr      *net.IPNet
+	targetIp        net.IP
+	targetLport     int
+	targetRport     int
+	targetType      string
+	targetAddrIndex int
 
 	// original request
 	url      string

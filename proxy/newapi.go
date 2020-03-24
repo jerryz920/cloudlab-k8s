@@ -165,16 +165,16 @@ func (c *MetadataProxy) workaroundEmptyTrustHub(mr *MetadataRequest) {
 }
 
 func (c *MetadataProxy) preInstanceCallHandler(mr *MetadataRequest) (string, int) {
-	if status := c.authzControl(mr, mr.OtherValues[2], false); status != http.StatusOK {
+	targetAddrIndex := 2
+	if mr.targetAddrIndex > 0 {
+		targetAddrIndex = mr.targetAddrIndex
+	}
+	if status := c.authzControl(mr, mr.OtherValues[targetAddrIndex], false); status != http.StatusOK {
 		return fmt.Sprintf("can not authorize request: %s, %s:%d-%d to %s:%d-%d\n",
 				mr.Principal, mr.ip, mr.lport, mr.rport,
 				mr.targetIp, mr.targetLport, mr.targetRport),
 			status
 	}
-
-	/// AuthID is not used any more, remove it
-	newRequest := append(mr.OtherValues[:2], mr.OtherValues[3:]...)
-	mr.OtherValues = newRequest
 
 	return "", http.StatusOK
 }
@@ -216,16 +216,16 @@ func (c *MetadataProxy) preVMInstanceCallHandler(mr *MetadataRequest) (string, i
 	if mr.Principal != IaaSProvider {
 		return "only IaaS provider can create VM", http.StatusUnauthorized
 	}
-	_, cidr, err := net.ParseCIDR(mr.OtherValues[3])
+	// Some unexpected changes in upstream repo.
+	_, cidr, err := net.ParseCIDR(mr.OtherValues[4])
 	if err != nil {
 		msg := fmt.Sprintf("can not allocate CIDR %s\n", err)
 		return msg, http.StatusBadRequest
 	}
 	mr.targetCidr = cidr
 	mr.targetType = VM_INSTANCE_TYPE
+	mr.targetAddrIndex = 3
 	/// Cidr is no longer used
-	newRequest := append(mr.OtherValues[:3], mr.OtherValues[4:]...)
-	mr.OtherValues = newRequest
 
 	return c.preInstanceCallHandler(mr)
 }
@@ -588,6 +588,7 @@ func (c *MetadataProxy) newHandler(mr *MetadataRequest, preHook func(*MetadataRe
 		msg := fmt.Sprintf("error encoding mr %v\n", err)
 		return msg, http.StatusInternalServerError
 	}
+	logrus.Infof("out going req=[%s]", buf.String())
 
 	outreq, err := http.NewRequest(mr.method, c.getUrl(mr.url), buf)
 	if err != nil {
