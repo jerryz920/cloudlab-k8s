@@ -1,0 +1,22 @@
+apiVersion: v1
+data:
+  spark-init.properties: |
+    #Java properties built from Kubernetes config map with name: spark-pi-fad763a704683250b5a39925c71c665b-init-config and config map key: spark-init.properties
+    #Tue Mar 24 04:21:56 MDT 2020
+    spark.kubernetes.mountDependencies.jarsDownloadDir=/var/spark-data/spark-jars
+    spark.kubernetes.initContainer.remoteJars=http\://192.168.0.1\:12345/spark-examples_2.11-2.3.2.jar,http\://192.168.0.1\:12345/spark-examples_2.11-2.3.2.jar
+    spark.kubernetes.mountDependencies.filesDownloadDir=/var/spark-data/spark-files
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2020-03-24T10:21:57Z"
+  name: spark-pi-fad763a704683250b5a39925c71c665b-init-config
+  namespace: latte-alice
+  ownerReferences:
+  - apiVersion: v1
+    controller: true
+    kind: Pod
+    name: spark-pi-driver
+    uid: 5ee0e973-a6a5-4dc6-992a-450a84164c73
+  resourceVersion: "70211"
+  selfLink: /api/v1/namespaces/latte-alice/configmaps/spark-pi-fad763a704683250b5a39925c71c665b-init-config
+  uid: 52338d5f-e56e-4081-bba0-972d716dcfb9

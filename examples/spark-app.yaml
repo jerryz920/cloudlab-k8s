@@ -1,0 +1,207 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    cni.projectcalico.org/podIP: 192.168.1.20/32
+    cni.projectcalico.org/podIPs: 192.168.1.20/32
+    latte.pubkey: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxb0BUr6PwdwqklYq1xpwy9pmj+HJ41S5wU5TbmDVVz147USoH8pt1RxsZ/q1IMVW4SWQ1jNxPGP5Z5PTqqyQ8ARnTGLxTv0JWyJ8ECXJSHBKKtdw1g42FsBt1MuXOFqPINcwwcSfPeRXCQrF/ex1Ds5LY+soKkLGQDEh+ulIxmEFs1qXhVaiNsLSk5IA+VRGXDC830iGpFJun4f8Hqvx13e7UIa7pRDhK+z2x2T1fjkLmk7WLKgfty12P1Q+FZHMgHlrpWB5wxlnTiPPhEX6qgDs8QDfkRpq+EQiAhu3X4HgwQyYfXBhL4+eEKAYmktQUwB17KBG5bQ3Eq4FTX6ZIQIDAQAB
+    latte.user: alice
+    spark-app-name: spark-pi
+  creationTimestamp: "2020-03-24T10:21:56Z"
+  labels:
+    spark-app-selector: spark-dea7b8f4528d4dd3bb86f2a0c246d3e4
+    spark-role: driver
+  name: spark-pi-driver
+  namespace: latte-alice
+  resourceVersion: "70369"
+  selfLink: /api/v1/namespaces/latte-alice/pods/spark-pi-driver
+  uid: 5ee0e973-a6a5-4dc6-992a-450a84164c73
+spec:
+  containers:
+  - args:
+    - driver
+    env:
+    - name: MDS_ADDR
+    - name: SPARK_DRIVER_MEMORY
+      value: 1g
+    - name: SPARK_DRIVER_CLASS
+      value: org.apache.spark.examples.SparkPi
+    - name: SPARK_DRIVER_ARGS
+    - name: SPARK_DRIVER_BIND_ADDRESS
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: status.podIP
+    - name: SPARK_MOUNTED_CLASSPATH
+      value: /var/spark-data/spark-jars/spark-examples_2.11-2.3.2.jar:/var/spark-data/spark-jars/spark-examples_2.11-2.3.2.jar
+    - name: SPARK_MOUNTED_FILES_DIR
+      value: /var/spark-data/spark-files
+    - name: SPARK_JAVA_OPT_0
+      value: -Dspark.kubernetes.authenticate.submission.caCertFile=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    - name: SPARK_JAVA_OPT_1
+      value: -Dspark.app.name=spark-pi
+    - name: SPARK_JAVA_OPT_2
+      value: -Dspark.app.id=spark-dea7b8f4528d4dd3bb86f2a0c246d3e4
+    - name: SPARK_JAVA_OPT_3
+      value: -Dspark.submit.deployMode=cluster
+    - name: SPARK_JAVA_OPT_4
+      value: -Dspark.master=k8s://https://10.10.2.1:6443
+    - name: SPARK_JAVA_OPT_5
+      value: -Dspark.driver.blockManager.port=7079
+    - name: SPARK_JAVA_OPT_6
+      value: -Dspark.kubernetes.authenticate.driver.serviceAccountName=latte-admin-alice
+    - name: SPARK_JAVA_OPT_7
+      value: -Dspark.jars=http://192.168.0.1:12345/spark-examples_2.11-2.3.2.jar,http://192.168.0.1:12345/spark-examples_2.11-2.3.2.jar
+    - name: SPARK_JAVA_OPT_8
+      value: -Dspark.driver.port=7078
+    - name: SPARK_JAVA_OPT_9
+      value: -Dspark.kubernetes.executor.podNamePrefix=spark-pi-fad763a704683250b5a39925c71c665b
+    - name: SPARK_JAVA_OPT_10
+      value: -Dspark.driver.host=spark-pi-fad763a704683250b5a39925c71c665b-driver-svc.latte-alice.svc
+    - name: SPARK_JAVA_OPT_11
+      value: -DMDS_ADDR=
+    - name: SPARK_JAVA_OPT_12
+      value: -Dspark.kubernetes.initContainer.configMapKey=spark-init.properties
+    - name: SPARK_JAVA_OPT_13
+      value: -Dspark.executor.instances=5
+    - name: SPARK_JAVA_OPT_14
+      value: -Dspark.kubernetes.namespace=latte-alice
+    - name: SPARK_JAVA_OPT_15
+      value: -Dspark.kubernetes.driver.pod.name=spark-pi-driver
+    - name: SPARK_JAVA_OPT_16
+      value: -Dspark.kubernetes.initContainer.configMapName=spark-pi-fad763a704683250b5a39925c71c665b-init-config
+    - name: SPARK_JAVA_OPT_17
+      value: -Dspark.kubernetes.container.image=spark:v2.3
+    image: spark:v2.3
+    imagePullPolicy: IfNotPresent
+    name: spark-kubernetes-driver
+    resources:
+      limits:
+        memory: 1408Mi
+      requests:
+        cpu: "1"
+        memory: 1Gi
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/spark-data/spark-jars
+      name: download-jars-volume
+    - mountPath: /var/spark-data/spark-files
+      name: download-files-volume
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: latte-admin-alice-token-q74dm
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  initContainers:
+  - args:
+    - init
+    - /etc/spark-init/spark-init.properties
+    image: spark:v2.3
+    imagePullPolicy: IfNotPresent
+    name: spark-init
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /etc/spark-init
+      name: spark-init-properties
+    - mountPath: /var/spark-data/spark-jars
+      name: download-jars-volume
+    - mountPath: /var/spark-data/spark-files
+      name: download-files-volume
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: latte-admin-alice-token-q74dm
+      readOnly: true
+  nodeName: compute1.yanzhai-qv67217.trustcloud-pg0.wisc.cloudlab.us
+  priority: 0
+  restartPolicy: Never
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: latte-admin-alice
+  serviceAccountName: latte-admin-alice
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - configMap:
+      defaultMode: 420
+      items:
+      - key: spark-init.properties
+        path: spark-init.properties
+      name: spark-pi-fad763a704683250b5a39925c71c665b-init-config
+    name: spark-init-properties
+  - emptyDir: {}
+    name: download-jars-volume
+  - emptyDir: {}
+    name: download-files-volume
+  - name: latte-admin-alice-token-q74dm
+    secret:
+      defaultMode: 420
+      secretName: latte-admin-alice-token-q74dm
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2020-03-24T10:22:10Z"
+    reason: PodCompleted
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2020-03-24T10:22:27Z"
+    reason: PodCompleted
+    status: "False"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2020-03-24T10:22:27Z"
+    reason: PodCompleted
+    status: "False"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2020-03-24T10:21:56Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: docker://4113d7e838975fb67cacbc7d0bf9fba96bf31fd1b91c72136e9ca1cb7b5c2927
+    image: spark:v2.3
+    imageID: docker://sha256:1d2444b795050fa1d48116a99d7907890b4fad7e56b1a76efda09f34ed965025
+    lastState: {}
+    name: spark-kubernetes-driver
+    ready: false
+    restartCount: 0
+    started: false
+    state:
+      terminated:
+        containerID: docker://4113d7e838975fb67cacbc7d0bf9fba96bf31fd1b91c72136e9ca1cb7b5c2927
+        exitCode: 0
+        finishedAt: "2020-03-24T10:22:25Z"
+        reason: Completed
+        startedAt: "2020-03-24T10:22:10Z"
+  hostIP: 128.105.145.228
+  initContainerStatuses:
+  - containerID: docker://9ab72863adbaa668f8df7935b3edf95b964fc80c5c0f5ebeec2b5a5b2cc0ef34
+    image: spark:v2.3
+    imageID: docker://sha256:1d2444b795050fa1d48116a99d7907890b4fad7e56b1a76efda09f34ed965025
+    lastState: {}
+    name: spark-init
+    ready: true
+    restartCount: 0
+    state:
+      terminated:
+        containerID: docker://9ab72863adbaa668f8df7935b3edf95b964fc80c5c0f5ebeec2b5a5b2cc0ef34
+        exitCode: 0
+        finishedAt: "2020-03-24T10:22:09Z"
+        reason: Completed
+        startedAt: "2020-03-24T10:22:07Z"
+  phase: Succeeded
+  podIP: 192.168.1.20
+  podIPs:
+  - ip: 192.168.1.20
+  qosClass: Burstable
+  startTime: "2020-03-24T10:22:04Z"
