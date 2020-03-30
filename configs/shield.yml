@@ -3,16 +3,13 @@ kind: Pod
 metadata:
   name: hdfs-shield
   labels:
-    service: hdfs-shield
-  namespace: kube-system
+    app: hdfs-shield
 spec:
   containers:
   - name: main
     image: shield
     imagePullPolicy: IfNotPresent
     env:
-      - name: CA_CERT
-        value: /opt/creds/ca.crt
       - name: TLS_CERT
         value: /opt/creds/shield.crt
       - name: TLS_KEY
@@ -21,9 +18,25 @@ spec:
     - mountPath: /opt/creds
       name: creds
       readOnly: true
-  hostNetwork: true
   volumes:
-  - hostPath:
-      path: /etc/kubernetes/shield-exts
-      type: DirectoryOrCreate
-    name: creds
+  - name: creds
+    secret:
+      secretName: hdfs-shield-creds
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hdfs-shield-service
+  labels:
+    app: hdfs-shield-service
+spec:
+  ports:
+  - port: 20000
+    protocol: TCP
+    nodePort: 30001
+  type: NodePort
+  selector:
+    app: hdfs-shield
+
+

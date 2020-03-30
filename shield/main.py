@@ -8,9 +8,7 @@ from hdfslib import do_hdfs_upload
 import os
 
 app=create(__name__)
-myid=None
 hdfs_url=os.environ.get("HDFS_URL", "http://namenode:50070")
-safe_url=os.environ.get("MDS_URL", "http://mds:19851")
 ca_cert = os.environ.get("CA_CERT", "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")
 cert = os.environ.get("TLS_CERT", "/opt/creds/server.crt")
 key = os.environ.get("TLS_KEY", "/opt/creds/server.key")
@@ -18,10 +16,10 @@ key = os.environ.get("TLS_KEY", "/opt/creds/server.key")
 
 @app.route('/upload', methods=['PUT'])
 def upload_hdfs():
+    print("filename = ", frequest.form['filename'])
+    print("tagname = ", frequest.form['tagname'])
     return do_hdfs_upload(
-            myid,
             hdfs_url,
-            safe_url,
             utils.keyhash(frequest.environ["peercert"]),
             frequest.form["filename"],
             frequest.files["file"],

@@ -81,6 +81,7 @@ for node in `bash wrun.sh hostname | dos2unix`; do
   index=$((index+1))
 done
 kubectl label node `hostname | dos2unix`  nodetype=master --overwrite
+kubectl create namespace kube-exts
 
 # installing a systemd service for http file upload
 # intentionally to be read only by root. Drop jar files to /openstack/files

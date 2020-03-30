@@ -1,1 +1,1 @@
-kubectl create secret generic hdfs-shield-creds --from-file=/etc/kubernetes/pki/apiserver.crt --from-file=/etc/kubernetes/pki/apiserver.key
+kubectl create secret generic hdfs-shield-creds --from-file=shield.crt --from-file=shield.key
