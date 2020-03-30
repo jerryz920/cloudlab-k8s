@@ -5,7 +5,6 @@ from server import create, run
 import sys
 import utils
 from hdfslib import do_hdfs_upload
-from api import define_tag
 import os
 
 app=create(__name__)

@@ -63,8 +63,8 @@ cd hadoop-image
 bash buildhdfs.sh
 
 # setup the necessary temporary directory for Hadoop data/name node
-bash allrun.sh "sudo mkdir -p /openstack/hdfs-name /openstack/hdfs-data;"
 cd ../
+bash allrun.sh "sudo mkdir -p /openstack/hdfs-name /openstack/hdfs-data;"
 
 echo "Relaunching HDFS cluster"
 # remove old first if exists
@@ -88,8 +88,17 @@ confirm "spark built , continue?"
 (
 echo "Building Shield Pod"
 cd shield
+gen_cert() {
+openssl req -new -nodes -newkey rsa:2048 -keyout $1.key -out $1.csr -subj "/O=users/CN=$1" -reqexts v3_req -config configs/shield.cnf
+
+sudo openssl x509 -req -days 1000 -in $1.csr -CA $2.crt -CAkey $2.key -set_serial 0101 -out $1.crt -sha256 -extensions 'v3_req' -extfile configs/shield.cnf
+}
 docker build -t shield .
-sudo bash create-creds.sh
+gen_cert shield /etc/kubernetes/pki/ca
+sudo mkdir -p /etc/kubernetes/shield-exts
+sudo mv shield.crt shield.key /etc/kubernetes/shield-exts/
+sudo cp /etc/kubernetes/pki/ca.crt /etc/kubernetes/shield-exts/
+sudo rm shield.csr
 )
 
 (

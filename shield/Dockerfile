@@ -4,6 +4,7 @@ run apt-get update
 run apt-get install -y python-dev libpython-dev python3-pip python3-dev libpython3-dev python-pip 
 run apt-get install -y libssl-dev
 run pip3 install Flask hdfs pyopenssl requests Werkzeug
+run apt-get install -y curl wget iputils-ping
 copy . /opt/hdfs-shield
 workdir /opt/hdfs-shield
 entrypoint ["/usr/bin/python3"]
