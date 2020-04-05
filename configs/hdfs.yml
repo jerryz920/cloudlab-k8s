@@ -35,6 +35,26 @@ spec:
       type: Directory
 ---
 apiVersion: v1
+kind: Pod # using pod is just a workaround for evaluation. Need better use of distributed persistent volume solution...
+metadata:
+  name: toolbox
+  labels:
+    app: hdfs-tool
+spec:
+  containers:
+    - name: namenode
+      image: uhopper/hadoop-namenode
+      imagePullPolicy: IfNotPresent
+      command: ["sleep", "10000000"]
+      env:
+      - name: CLUSTER_NAME
+        value: k8s-hdfs
+      - name: HADOOP_HOME
+        value: /opt/hadoop-2.8.0
+ #     - name: HDFS_CONF_dfs_namenode_datanode_registration_ip___hostname___check
+ #       value: false
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: namenode

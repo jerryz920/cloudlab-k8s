@@ -8,7 +8,7 @@ confirm() {
 }
 sudo chown -R $USER:`id -g -n` ~/.m2
 
-
+build_k8s() {
 (
 echo "Building K8s"
 cd kubernetes
@@ -47,16 +47,17 @@ done
 bash allrun.sh "sudo systemctl start kubelet;"
 
 )
+}
 
-confirm "k8s built, continue?"
+build_hdfs() {
 
+kubectl delete -f configs/hdfs.yml
 (
 echo "Building Hdfs"
 cd hadoop
 bash docker-build.sh
 )
 
-confirm "hdfs built , continue?"
 (
 echo "Building Hdfs-Docker-Images"
 cd hadoop-image
@@ -68,11 +69,10 @@ bash allrun.sh "sudo mkdir -p /openstack/hdfs-name /openstack/hdfs-data;"
 
 echo "Relaunching HDFS cluster"
 # remove old first if exists
-kubectl delete -f configs/hdfs.yml
-sleep 5
-kubectl create -f configs/hdfs.yml
 )
-confirm "hdfs docker built , continue?"
+}
+
+build_spark() {
 
 (
 echo "Building Spark and Spark Docker Images"
@@ -83,13 +83,18 @@ bin/docker-image-tool.sh -t v2.3 build
 echo "Provision Spark Cluster Credentials"
 kubectl create -f configs/spark.yml
 )
-confirm "spark built , continue?"
+}
 
+build_shield() {
 (
 echo "Building Shield Pod"
 
+kubectl delete -f configs/shield.yml
 # install hostname to use for shield
+grep shield.latte.org /etc/hosts > /dev/null
+if [ $? -ne 0 ]; then
 bash allrun.sh "echo '127.0.0.1 shield.latte.org' | sudo tee -a /etc/hosts"
+fi
 
 
 cd shield
@@ -103,13 +108,9 @@ gen_cert shield /etc/kubernetes/pki/ca
 bash create-creds.sh
 sudo rm shield.csr shield.key shield.crt
 
-
 )
+}
 
-(
-# There is no simple way of setting up docker repository, so we load them on
-# every node.
-echo "Loading Docker Images"
 wload() {
   docker image save $1 > $2.tar
   bash wcp.sh $2.tar
@@ -117,12 +118,19 @@ wload() {
   rm $2.tar
 }
 
+load_image() {
+(
+# There is no simple way of setting up docker repository, so we load them on
+# every node.
+echo "Loading Docker Images"
+
 wload uhopper/hadoop-datanode dn
 wload uhopper/hadoop-namenode nn
 wload spark:v2.3 spark
-wload shield shield
 )
+}
 
+build_misc() {
 (
 echo "Building Latte Proxy"
 cd proxy
@@ -135,4 +143,28 @@ cd riak-image
 docker build -t riak .
 docker run -t --rm -d -p 8098:8098 -p 8087:8087 --name riak riak
 )
+}
+
+TARGETS=${*:-"k8s hdfs spark misc shield image"}
+
+for n in $TARGETS; do
+  case $n in
+    k8s) build_k8s;;
+    hdfs) build_hdfs;
+      wload uhopper/hadoop-datanode dn;
+      wload uhopper/hadoop-namenode nn;
+      kubectl create -f configs/hdfs.yml;;
+    spark) build_spark;
+      wload spark:v2.3 spark
+      ;;
+    misc) build_misc;;
+    shield) build_shield;
+      wload shield shield;
+      kubectl create -f configs/shield.yml;
+      ;;
+    image) load_image;;
+    *) echo "unknown target $n"
+  esac
+done
+
 

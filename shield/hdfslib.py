@@ -17,12 +17,13 @@ def do_hdfs_upload(url, keyhash, fname, fdata, ftag):
 
     # create hdfs client on demand now. No need to optimize for PoC
     hdfs_client = hdfs.InsecureClient(url, user=ftag)
-    return hdfs_client.write(fname, fdata, overwrite=True, permission=666)
+    hdfs_client.write(fname, fdata, overwrite=True, permission=666)
+    return "file written"
 
-def prepare_dir(url, dirname, keyhash):
+def prepare_user_dir(url, dirname, keyhash):
     hdfs_client = hdfs.InsecureClient(url, user='root')
     # We don't know if this exist or not.
-    hdfs_client.makedirs(dirname, permission=0600)
+    hdfs_client.makedirs(dirname, permission=733)
     hdfs_client.set_owner(dirname, owner=keyhash)
 
 
