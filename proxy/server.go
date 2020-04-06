@@ -6,8 +6,10 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"regexp"
 	"strconv"
@@ -23,6 +25,7 @@ type MetadataProxy struct {
 	client    *http.Client
 	addr      string
 	newCaches []Cache
+	pods      map[string]Pod
 }
 
 func (r MetadataRequest) ByteBuf() (*bytes.Buffer, error) {
@@ -202,11 +205,15 @@ func main() {
 		},
 		addr:      SafeAddr,
 		newCaches: caches,
+		pods:      make(map[string]Pod),
 	}
 	server := kvstore.NewKvStore(rootHandler)
 
 	SetupNewAPIs(&client, server)
 	//// New APIs
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
 
 	if err := server.ListenAndServe(ListenAddr); err != nil {
 		logrus.Fatal("can not listen on address: ", err)

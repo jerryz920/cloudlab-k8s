@@ -83,6 +83,9 @@ type RiakConn interface {
 	GetNetIDMap(ip net.IP, lport int, rport int) (*InstanceCred, error)
 	DelNetIDMap(ip net.IP, lport int, rport int) error
 	GetAllNetID(ip net.IP) ([]CachedInstance, error)
+	PutPodMap(ip net.IP, pod CachedPod) error
+	// GetPod will delete expired pod.
+	GetPodMap(ip net.IP) (CachedPod, error)
 	///
 	SearchIDNet(uuid string) ([]CachedInstance, error)
 	Shutdown() error
@@ -386,6 +389,15 @@ func (c *riakConn) SearchIDNet(uuid string) ([]CachedInstance, error) {
 		return result, nil
 	}
 	return result, errors.New("unknown command")
+}
+
+func (c *riakConn) PutPodMap(ip net.IP, pod *CachedPod) error {
+	return nil
+}
+
+// GetPod will delete expired pod.
+func (c *riakConn) GetPodMap(ip net.IP) (*CachedPod, error) {
+	return nil, nil
 }
 
 func (c *riakConn) Shutdown() error {

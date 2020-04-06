@@ -627,7 +627,7 @@ func (c *MetadataProxy) newHandler(mr *MetadataRequest, preHook func(*MetadataRe
 	return string(data), resp.StatusCode
 }
 
-func (c *MetadataProxy) authenticate_addr(w http.ResponseWriter, r *http.Request) {
+func (c *MetadataProxy) authenticateAddr(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	saddr := vars["instance_addr"]
 	logrus.Infof("authenticating addr: %s", saddr)
@@ -781,7 +781,9 @@ func SetupNewAPIs(c *MetadataProxy, server *jhttp.APIServer) {
 		server.AddRoute(method, c.handleOtherNoAuth, "")
 	}
 
-	server.AddRoute("/authenticate/{instance_addr}", c.authenticate_addr, "")
+	server.AddRoute("/postPod", c.postPodNew, "")
+	server.AddRoute("/authPod/{addr}", c.authPodNew, "")
+	server.AddRoute("/authenticate/{instance_addr}", c.authenticateAddr, "")
 
 	return
 

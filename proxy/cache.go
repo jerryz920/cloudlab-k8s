@@ -29,6 +29,8 @@ type Cache interface {
 	GetInstanceFromID(pid string) (CachedInstance, int)
 	PutInstance(inst *CachedInstance) int
 	DelInstance(ip net.IP, lport, rport int, pid string) int
+	GetPod(inst *CachedPod) int
+	PutPod(inst *CachedPod, expireSec time.Time) int
 }
 
 type cacheImpl struct {
@@ -188,4 +190,12 @@ func (c *cacheImpl) DelInstance(ip net.IP, lport, rport int, pid string) int {
 	}
 	logrus.Infof("%d PERFCACHE DelInstance %f", c.id, time.Now().Sub(t1).Seconds())
 	return http.StatusOK
+}
+
+func (c *cacheImpl) GetPod(inst *CachedPod) int {
+	return 0
+}
+
+func (c *cacheImpl) PutPod(inst *CachedPod, expireSec time.Time) int {
+	return 0
 }

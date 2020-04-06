@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net"
+	"time"
 
 	logrus "github.com/sirupsen/logrus"
 )
@@ -77,4 +78,10 @@ type CachedInstance struct {
 	Lport int
 	Rport int
 	ID    *InstanceCred
+}
+
+type CachedPod struct {
+	Ip          net.IP
+	Expire      time.Time
+	PodInstance Pod
 }
