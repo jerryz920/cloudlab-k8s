@@ -59,5 +59,12 @@ echo "   cp -i config-$USER_TO_CREATE ~/.kube/config"
 echo " Then you can use kubectl to operate on behave of this user."
 echo "##############################################################"
 
+USERHOME=/openstack/home/$USER_TO_CREATE
+sudo mkdir -p $USERHOME
+sudo useradd -m -d $USERHOME -s /bin/bash $USER_TO_CREATE
+sudo mkdir -p $USERHOME/.kube
+sudo cp -f config-$USER_TO_CREATE $USERHOME/.kube/config
+sudo chown -R $USER_TO_CREATE $USERHOME/
+
 
 

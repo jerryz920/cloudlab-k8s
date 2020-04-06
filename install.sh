@@ -73,6 +73,7 @@ export GOPATH=~/go
 export PATH=$PATH:$GOROOT/bin/:$GOPATH/bin/
 
 
+popd
 # label nodes to prepare hdfs running
 index=0
 for node in `bash wrun.sh hostname | dos2unix`; do
