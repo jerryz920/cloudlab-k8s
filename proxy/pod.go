@@ -38,6 +38,7 @@ func (c *MetadataProxy) postPodNew(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	logrus.Infof("Pod post req: %v", *podReq)
 
 	addr := podReq.Addr
 	uuid := podReq.Uuid
@@ -52,6 +53,7 @@ func (c *MetadataProxy) authPodNew(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	addr := vars["addr"]
 	if pod, ok := c.pods[addr]; ok {
+		logrus.Infof("Pod auth req for %s: %v", addr, pod)
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(fmt.Sprintf("%s\n%s\n", pod.Uuid, pod.Tag)))
 	} else {

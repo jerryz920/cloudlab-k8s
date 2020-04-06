@@ -83,9 +83,9 @@ type RiakConn interface {
 	GetNetIDMap(ip net.IP, lport int, rport int) (*InstanceCred, error)
 	DelNetIDMap(ip net.IP, lport int, rport int) error
 	GetAllNetID(ip net.IP) ([]CachedInstance, error)
-	PutPodMap(ip net.IP, pod CachedPod) error
+	PutPodMap(ip net.IP, pod *CachedPod) error
 	// GetPod will delete expired pod.
-	GetPodMap(ip net.IP) (CachedPod, error)
+	GetPodMap(ip net.IP) (*CachedPod, error)
 	///
 	SearchIDNet(uuid string) ([]CachedInstance, error)
 	Shutdown() error
