@@ -13,7 +13,8 @@ build_k8s() {
 echo "Building K8s"
 cd kubernetes
 # TODO: put k8s build script things here.
-KUBE_FASTBUILD=true build/run.sh make kube-apiserver kube-proxy kube-controller-manager kube-scheduler kubectl kubelet kubeadm
+#KUBE_FASTBUILD=true build/run.sh make kube-apiserver kube-proxy kube-controller-manager kube-scheduler kubectl kubelet kubeadm
+KUBE_FASTBUILD=true make kube-apiserver kube-proxy kube-controller-manager kube-scheduler kubectl kubelet kubeadm
 if [ $? -ne 0 ]; then
 	echo "build fail!"
 	exit 1
@@ -135,6 +136,10 @@ build_misc() {
 echo "Building Latte Proxy"
 cd proxy
 make
+grep mds.latte.org /etc/hosts > /dev/null
+if [ $? -ne 0 ]; then
+  bash allrun.sh "echo '10.10.2.1 mds mds.latte.org' | sudo tee -a /etc/hosts"
+fi
 )
 
 (

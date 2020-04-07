@@ -49,15 +49,38 @@ func (c *MetadataProxy) postPodNew(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (c *MetadataProxy) authPodNew(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	addr := vars["addr"]
+func (c *MetadataProxy) authPodInner(addr string) *Pod {
 	if pod, ok := c.pods[addr]; ok {
 		logrus.Infof("Pod auth req for %s: %v", addr, pod)
+		return &pod
+	} else {
+		return nil
+	}
+
+}
+
+func (c *MetadataProxy) authPodNew(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	saddr := vars["addr"]
+
+	if pod := c.authPodInner(saddr); pod != nil {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(fmt.Sprintf("%s\n%s\n", pod.Uuid, pod.Tag)))
+		return
+	}
+	addrPort := saddr
+	addr, _, _, status := ParseIP2(addrPort)
+	if status != http.StatusOK || addr == "" {
+		logrus.Errorf("must provide a valid ip address: %v", addrPort)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if pod := c.authPodInner(addr); pod != nil {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(fmt.Sprintf("%s\n%s\n", pod.Uuid, pod.Tag)))
 	} else {
-		logrus.Error("fail to authenticate the network address")
+		logrus.Errorf("fail to authenticate the network address: [%v]", saddr)
 		w.WriteHeader(http.StatusNotFound)
 	}
 }
