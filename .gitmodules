@@ -10,3 +10,6 @@
 	path = spark
 	url = https://github.com/jerryz920/spark
 	branch = latte-k8s
+[submodule "spatial"]
+	path = spatial
+	url = https://github.com/jerryz920/SpatialSpark
