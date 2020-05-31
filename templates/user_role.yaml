@@ -16,8 +16,14 @@ metadata:
   name: namespace_admin_USERNAME
 rules:
 - apiGroups: [""] # "" indicates the core API group
-  resources: ["pods","services","endpoints","configmaps", "serviceaccounts"]
+  resources: ["pods","services","endpoints","configmaps", "serviceaccounts", "secret"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods/log"]
+  verbs: ["get", "list"]
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods/exec"]
+  verbs: ["create"]
 - apiGroups: ["extensions", "apps"]
   resources: ["deployments", "statefulset"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
