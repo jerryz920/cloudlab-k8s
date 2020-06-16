@@ -1,0 +1,17 @@
+This folder contains real attestation values posted from kubernetes to MDS
+
+each .sh file is a simple curl script that almost equals to what K8s did for an http request (minor differences in header/agent, etc)
+each .json file is the request body in SAFE request format.
+
+Naming convention:
+req.<uuid>_pod.json is the main statement, which posts the pod as an instance, image field as the sha256 hash of its entire configuration spec.
+req.<uuid>_global.json is the config set of the pod, including metadata information like output tag, user, pubkey hash.
+req.<uuid>__<ctn_name>.json is the config set of a container with name <ctn_name> under pod <uuid>, it has all the cmdline args, environment variables, etc.
+  note: a pod can have init containers, which are not specially treated. An example: req.026f48d4-3a68-42fd-b8b0-9c94f00b1f1a__spark-init.json
+req.<uuid>_containers.json is the list of container names in a pod.
+
+Example pod structure:
+026f48d4-3a68-42fd-b8b0-9c94f00b1f1a: driver pod
+2df11174-0b17-4056-a8e7-f248876f7acf: executor 1
+776740af-4895-4eaf-83a3-b7552227b13b: executor 2
+8d827ee8-91a6-4402-9df5-ed2414d6edcd: executor 3

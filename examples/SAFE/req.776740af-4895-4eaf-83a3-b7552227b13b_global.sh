@@ -1,0 +1,1 @@
+curl -XPOST "http://mds:19851/postInstanceConfig" --data-binary "@/tmp/latte-k8s/req.776740af-4895-4eaf-83a3-b7552227b13b_global.json"

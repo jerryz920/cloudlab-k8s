@@ -138,7 +138,7 @@ cd proxy
 make
 grep mds.latte.org /etc/hosts > /dev/null
 if [ $? -ne 0 ]; then
-  bash allrun.sh "echo '10.10.2.1 mds mds.latte.org' | sudo tee -a /etc/hosts"
+  bash allrun.sh "echo '10.10.1.1 mds mds.latte.org' | sudo tee -a /etc/hosts"
 fi
 )
 

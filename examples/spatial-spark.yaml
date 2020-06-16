@@ -1,0 +1,752 @@
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      cni.projectcalico.org/podIP: 192.168.1.17/32
+      cni.projectcalico.org/podIPs: 192.168.1.17/32
+      latte.outputTag: testtag
+      latte.pubkey: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAx9iK7rpiQZE6u7KzV2QYyhs9M5V/AdEELSdd3+u81lKuHPsnhOWALKY3OJMs/6xOCvEPGeWz3Qr61O5qHGrDGy2/sBcfztJL9xpDVnmPCH23LZThENdkFDoENwT9BxJgsNx+JUicxCNeX3wdi5CgRdI32IDUkCf4/3r1uGk530fWCUAezt25vjO3fYSpWbinL0KVusEh8VlO1LQRXX/x10OrEj9rwrd4wHelYJInSr7JADGEIKlmSHKb7hquAuEtl6xsbrXI59lsU2y8A3rdiW61IPpYg3ZvMG3KCJqTAeHtxg0jycG37AT5euQNyqjspRB9DV7secTkgeZ1Tc0CNwIDAQAB
+      latte.user: gabbi
+      spark-app-name: spatial-spark
+    creationTimestamp: "2020-06-16T15:55:30Z"
+    labels:
+      spark-app-selector: spark-062f21c4b73a402a9f842473fed60776
+      spark-role: driver
+    name: spatial-spark
+    namespace: latte-gabbi
+    resourceVersion: "1372278"
+    selfLink: /api/v1/namespaces/latte-gabbi/pods/spatial-spark
+    uid: 026f48d4-3a68-42fd-b8b0-9c94f00b1f1a
+  spec:
+    containers:
+    - args:
+      - driver
+      env:
+      - name: MDS_ADDR
+      - name: SPARK_DRIVER_MEMORY
+        value: 1g
+      - name: SPARK_DRIVER_CLASS
+        value: spatialspark.main.SpatialJoinApp
+      - name: SPARK_DRIVER_ARGS
+        value: --left hdfs://10.105.114.62/d07c25a2aaf1dcbe5e93177e316c09e84912b01cadf33670100ee73bf167f227/point1k.tsv
+          --right hdfs://10.105.114.62/d07c25a2aaf1dcbe5e93177e316c09e84912b01cadf33670100ee73bf167f227/nycb.tsv
+          --geom_left 1 --geom_right 0 --output hdfs://10.105.114.62/3d33e16accc3ec9bcc566acad6701b0e7b93be1d45191d24dcd66bd331a91fe7/output1
+          --broadcast false --predicate within --method stp --conf 16:16:0.1 --parallel_part
+          false
+      - name: SPARK_DRIVER_BIND_ADDRESS
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: status.podIP
+      - name: SPARK_MOUNTED_CLASSPATH
+        value: /var/spark-data/spark-jars/spatial-spark.jar:/var/spark-data/spark-jars/spatial-spark.jar
+      - name: SPARK_MOUNTED_FILES_DIR
+        value: /var/spark-data/spark-files
+      - name: SPARK_JAVA_OPT_0
+        value: -Dspark.kubernetes.authenticate.submission.caCertFile=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      - name: SPARK_JAVA_OPT_1
+        value: -Dspark.executor.instances=3
+      - name: SPARK_JAVA_OPT_2
+        value: -Dspark.master=k8s://https://10.10.1.1:6443
+      - name: SPARK_JAVA_OPT_3
+        value: -Dspark.submit.deployMode=cluster
+      - name: SPARK_JAVA_OPT_4
+        value: -Dspark.driver.blockManager.port=7079
+      - name: SPARK_JAVA_OPT_5
+        value: -Dspark.app.name=spatial-spark
+      - name: SPARK_JAVA_OPT_6
+        value: -Dspark.kubernetes.executor.podNamePrefix=spatial-spark-26cc9625ccb0362f834ba50405af6879
+      - name: SPARK_JAVA_OPT_7
+        value: -Dspark.kubernetes.initContainer.configMapName=spatial-spark-26cc9625ccb0362f834ba50405af6879-init-config
+      - name: SPARK_JAVA_OPT_8
+        value: -Dspark.driver.port=7078
+      - name: SPARK_JAVA_OPT_9
+        value: -Dspark.kubernetes.authenticate.driver.serviceAccountName=latte-admin-gabbi
+      - name: SPARK_JAVA_OPT_10
+        value: -Dspark.driver.host=spatial-spark-26cc9625ccb0362f834ba50405af6879-driver-svc.latte-gabbi.svc
+      - name: SPARK_JAVA_OPT_11
+        value: -DMDS_ADDR=
+      - name: SPARK_JAVA_OPT_12
+        value: -Dspark.kubernetes.initContainer.configMapKey=spark-init.properties
+      - name: SPARK_JAVA_OPT_13
+        value: -Dspark.kubernetes.driver.pod.name=spatial-spark
+      - name: SPARK_JAVA_OPT_14
+        value: -Dspark.kubernetes.container.image=spark:v2.3
+      - name: SPARK_JAVA_OPT_15
+        value: -Dspark.kubernetes.namespace=latte-gabbi
+      - name: SPARK_JAVA_OPT_16
+        value: -Dspark.latte.outputTag=testtag
+      - name: SPARK_JAVA_OPT_17
+        value: -Dspark.jars=http://192.168.0.1:12345/spatial-spark.jar,http://192.168.0.1:12345/spatial-spark.jar
+      - name: SPARK_JAVA_OPT_18
+        value: -Dspark.app.id=spark-062f21c4b73a402a9f842473fed60776
+      image: spark:v2.3
+      imagePullPolicy: IfNotPresent
+      name: spark-kubernetes-driver
+      resources:
+        limits:
+          memory: 1408Mi
+        requests:
+          cpu: "1"
+          memory: 1Gi
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/spark-data/spark-jars
+        name: download-jars-volume
+      - mountPath: /var/spark-data/spark-files
+        name: download-files-volume
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: latte-admin-gabbi-token-569b6
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    initContainers:
+    - args:
+      - init
+      - /etc/spark-init/spark-init.properties
+      image: spark:v2.3
+      imagePullPolicy: IfNotPresent
+      name: spark-init
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /etc/spark-init
+        name: spark-init-properties
+      - mountPath: /var/spark-data/spark-jars
+        name: download-jars-volume
+      - mountPath: /var/spark-data/spark-files
+        name: download-files-volume
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: latte-admin-gabbi-token-569b6
+        readOnly: true
+    nodeName: compute1.yanzhai-qv73493.trustcloud-pg0.utah.cloudlab.us
+    priority: 0
+    restartPolicy: Never
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: latte-admin-gabbi
+    serviceAccountName: latte-admin-gabbi
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - configMap:
+        defaultMode: 420
+        items:
+        - key: spark-init.properties
+          path: spark-init.properties
+        name: spatial-spark-26cc9625ccb0362f834ba50405af6879-init-config
+      name: spark-init-properties
+    - emptyDir: {}
+      name: download-jars-volume
+    - emptyDir: {}
+      name: download-files-volume
+    - name: latte-admin-gabbi-token-569b6
+      secret:
+        defaultMode: 420
+        secretName: latte-admin-gabbi-token-569b6
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2020-06-16T15:55:35Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2020-06-16T15:55:36Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2020-06-16T15:55:36Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2020-06-16T15:55:30Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: docker://19ce84ed955f5aad3416b879c7e479c8c7dfaea07f26aa437d7e75da05c710f6
+      image: spark:v2.3
+      imageID: docker://sha256:1828b6280b2356d965f4bff2a833d329f55747c4087b7bc71c8173ba97cd56c6
+      lastState: {}
+      name: spark-kubernetes-driver
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2020-06-16T15:55:36Z"
+    hostIP: 128.110.154.21
+    initContainerStatuses:
+    - containerID: docker://b60d18a568e68f3e6371d5366ccb0da3e14744764d2d8e09f8e88920f61d85ee
+      image: spark:v2.3
+      imageID: docker://sha256:1828b6280b2356d965f4bff2a833d329f55747c4087b7bc71c8173ba97cd56c6
+      lastState: {}
+      name: spark-init
+      ready: true
+      restartCount: 0
+      state:
+        terminated:
+          containerID: docker://b60d18a568e68f3e6371d5366ccb0da3e14744764d2d8e09f8e88920f61d85ee
+          exitCode: 0
+          finishedAt: "2020-06-16T15:55:35Z"
+          reason: Completed
+          startedAt: "2020-06-16T15:55:33Z"
+    phase: Running
+    podIP: 192.168.1.17
+    podIPs:
+    - ip: 192.168.1.17
+    qosClass: Burstable
+    startTime: "2020-06-16T15:55:30Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      cni.projectcalico.org/podIP: 192.168.3.17/32
+      cni.projectcalico.org/podIPs: 192.168.3.17/32
+      latte.outputTag: testtag
+      latte.user: system:serviceaccount:latte-gabbi:latte-admin-gabbi
+    creationTimestamp: "2020-06-16T15:55:41Z"
+    labels:
+      spark-app-selector: spark-application-1592322938899
+      spark-exec-id: "1"
+      spark-role: executor
+    name: spatial-spark-26cc9625ccb0362f834ba50405af6879-exec-1
+    namespace: latte-gabbi
+    ownerReferences:
+    - apiVersion: v1
+      controller: true
+      kind: Pod
+      name: spatial-spark
+      uid: 026f48d4-3a68-42fd-b8b0-9c94f00b1f1a
+    resourceVersion: "1372345"
+    selfLink: /api/v1/namespaces/latte-gabbi/pods/spatial-spark-26cc9625ccb0362f834ba50405af6879-exec-1
+    uid: 2df11174-0b17-4056-a8e7-f248876f7acf
+  spec:
+    containers:
+    - args:
+      - executor
+      env:
+      - name: SPARK_DRIVER_URL
+        value: spark://CoarseGrainedScheduler@spatial-spark-26cc9625ccb0362f834ba50405af6879-driver-svc.latte-gabbi.svc:7078
+      - name: SPARK_EXECUTOR_CORES
+        value: "1"
+      - name: SPARK_EXECUTOR_MEMORY
+        value: 1g
+      - name: SPARK_APPLICATION_ID
+        value: spark-application-1592322938899
+      - name: SPARK_EXECUTOR_ID
+        value: "1"
+      - name: SPARK_MOUNTED_CLASSPATH
+        value: /var/spark-data/spark-jars/*
+      - name: SPARK_EXECUTOR_POD_IP
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: status.podIP
+      - name: MDS_ADDR
+      - name: SPARK_MOUNTED_FILES_DIR
+        value: /var/spark-data/spark-files
+      image: spark:v2.3
+      imagePullPolicy: IfNotPresent
+      name: executor
+      ports:
+      - containerPort: 7079
+        name: blockmanager
+        protocol: TCP
+      resources:
+        limits:
+          memory: 1408Mi
+        requests:
+          cpu: "1"
+          memory: 1Gi
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/spark-data/spark-jars
+        name: download-jars-volume
+      - mountPath: /var/spark-data/spark-files
+        name: download-files-volume
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: default-token-b5x52
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    hostname: spatial-spark-26cc9625ccb0362f834ba50405af6879-exec-1
+    initContainers:
+    - args:
+      - init
+      - /etc/spark-init/spark-init.properties
+      image: spark:v2.3
+      imagePullPolicy: IfNotPresent
+      name: spark-init
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /etc/spark-init
+        name: spark-init-properties
+      - mountPath: /var/spark-data/spark-jars
+        name: download-jars-volume
+      - mountPath: /var/spark-data/spark-files
+        name: download-files-volume
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: default-token-b5x52
+        readOnly: true
+    nodeName: network.yanzhai-qv73493.trustcloud-pg0.utah.cloudlab.us
+    priority: 0
+    restartPolicy: Never
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - configMap:
+        defaultMode: 420
+        items:
+        - key: spark-init.properties
+          path: spark-init.properties
+        name: spatial-spark-26cc9625ccb0362f834ba50405af6879-init-config
+      name: spark-init-properties
+    - emptyDir: {}
+      name: download-jars-volume
+    - emptyDir: {}
+      name: download-files-volume
+    - name: default-token-b5x52
+      secret:
+        defaultMode: 420
+        secretName: default-token-b5x52
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2020-06-16T15:55:45Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2020-06-16T15:55:46Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2020-06-16T15:55:46Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2020-06-16T15:55:41Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: docker://31d85245e414c320a8599b13698d20f031920b772e065274c2000080951576c7
+      image: spark:v2.3
+      imageID: docker://sha256:1828b6280b2356d965f4bff2a833d329f55747c4087b7bc71c8173ba97cd56c6
+      lastState: {}
+      name: executor
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2020-06-16T15:55:45Z"
+    hostIP: 128.110.154.9
+    initContainerStatuses:
+    - containerID: docker://d9207ebd21b520d1e0abe33e2343af97ef5d5855557a987e3b16a16d018a3c0b
+      image: spark:v2.3
+      imageID: docker://sha256:1828b6280b2356d965f4bff2a833d329f55747c4087b7bc71c8173ba97cd56c6
+      lastState: {}
+      name: spark-init
+      ready: true
+      restartCount: 0
+      state:
+        terminated:
+          containerID: docker://d9207ebd21b520d1e0abe33e2343af97ef5d5855557a987e3b16a16d018a3c0b
+          exitCode: 0
+          finishedAt: "2020-06-16T15:55:44Z"
+          reason: Completed
+          startedAt: "2020-06-16T15:55:42Z"
+    phase: Running
+    podIP: 192.168.3.17
+    podIPs:
+    - ip: 192.168.3.17
+    qosClass: Burstable
+    startTime: "2020-06-16T15:55:41Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      cni.projectcalico.org/podIP: 192.168.2.18/32
+      cni.projectcalico.org/podIPs: 192.168.2.18/32
+      latte.outputTag: testtag
+      latte.user: system:serviceaccount:latte-gabbi:latte-admin-gabbi
+    creationTimestamp: "2020-06-16T15:55:41Z"
+    labels:
+      spark-app-selector: spark-application-1592322938899
+      spark-exec-id: "2"
+      spark-role: executor
+    name: spatial-spark-26cc9625ccb0362f834ba50405af6879-exec-2
+    namespace: latte-gabbi
+    ownerReferences:
+    - apiVersion: v1
+      controller: true
+      kind: Pod
+      name: spatial-spark
+      uid: 026f48d4-3a68-42fd-b8b0-9c94f00b1f1a
+    resourceVersion: "1372346"
+    selfLink: /api/v1/namespaces/latte-gabbi/pods/spatial-spark-26cc9625ccb0362f834ba50405af6879-exec-2
+    uid: 776740af-4895-4eaf-83a3-b7552227b13b
+  spec:
+    containers:
+    - args:
+      - executor
+      env:
+      - name: SPARK_DRIVER_URL
+        value: spark://CoarseGrainedScheduler@spatial-spark-26cc9625ccb0362f834ba50405af6879-driver-svc.latte-gabbi.svc:7078
+      - name: SPARK_EXECUTOR_CORES
+        value: "1"
+      - name: SPARK_EXECUTOR_MEMORY
+        value: 1g
+      - name: SPARK_APPLICATION_ID
+        value: spark-application-1592322938899
+      - name: SPARK_EXECUTOR_ID
+        value: "2"
+      - name: SPARK_MOUNTED_CLASSPATH
+        value: /var/spark-data/spark-jars/*
+      - name: SPARK_EXECUTOR_POD_IP
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: status.podIP
+      - name: MDS_ADDR
+      - name: SPARK_MOUNTED_FILES_DIR
+        value: /var/spark-data/spark-files
+      image: spark:v2.3
+      imagePullPolicy: IfNotPresent
+      name: executor
+      ports:
+      - containerPort: 7079
+        name: blockmanager
+        protocol: TCP
+      resources:
+        limits:
+          memory: 1408Mi
+        requests:
+          cpu: "1"
+          memory: 1Gi
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/spark-data/spark-jars
+        name: download-jars-volume
+      - mountPath: /var/spark-data/spark-files
+        name: download-files-volume
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: default-token-b5x52
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    hostname: spatial-spark-26cc9625ccb0362f834ba50405af6879-exec-2
+    initContainers:
+    - args:
+      - init
+      - /etc/spark-init/spark-init.properties
+      image: spark:v2.3
+      imagePullPolicy: IfNotPresent
+      name: spark-init
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /etc/spark-init
+        name: spark-init-properties
+      - mountPath: /var/spark-data/spark-jars
+        name: download-jars-volume
+      - mountPath: /var/spark-data/spark-files
+        name: download-files-volume
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: default-token-b5x52
+        readOnly: true
+    nodeName: compute2.yanzhai-qv73493.trustcloud-pg0.utah.cloudlab.us
+    priority: 0
+    restartPolicy: Never
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - configMap:
+        defaultMode: 420
+        items:
+        - key: spark-init.properties
+          path: spark-init.properties
+        name: spatial-spark-26cc9625ccb0362f834ba50405af6879-init-config
+      name: spark-init-properties
+    - emptyDir: {}
+      name: download-jars-volume
+    - emptyDir: {}
+      name: download-files-volume
+    - name: default-token-b5x52
+      secret:
+        defaultMode: 420
+        secretName: default-token-b5x52
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2020-06-16T15:55:45Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2020-06-16T15:55:46Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2020-06-16T15:55:46Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2020-06-16T15:55:41Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: docker://565ca4937866b228f484f8f3b967f2ddab72e8ba905f3d5872b868ca3415b7f2
+      image: spark:v2.3
+      imageID: docker://sha256:1828b6280b2356d965f4bff2a833d329f55747c4087b7bc71c8173ba97cd56c6
+      lastState: {}
+      name: executor
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2020-06-16T15:55:45Z"
+    hostIP: 128.110.154.30
+    initContainerStatuses:
+    - containerID: docker://0275a06c76d85a857af1309c118f7b723283149057bb36ab992fa00181f4c929
+      image: spark:v2.3
+      imageID: docker://sha256:1828b6280b2356d965f4bff2a833d329f55747c4087b7bc71c8173ba97cd56c6
+      lastState: {}
+      name: spark-init
+      ready: true
+      restartCount: 0
+      state:
+        terminated:
+          containerID: docker://0275a06c76d85a857af1309c118f7b723283149057bb36ab992fa00181f4c929
+          exitCode: 0
+          finishedAt: "2020-06-16T15:55:44Z"
+          reason: Completed
+          startedAt: "2020-06-16T15:55:42Z"
+    phase: Running
+    podIP: 192.168.2.18
+    podIPs:
+    - ip: 192.168.2.18
+    qosClass: Burstable
+    startTime: "2020-06-16T15:55:41Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      cni.projectcalico.org/podIP: 192.168.1.18/32
+      cni.projectcalico.org/podIPs: 192.168.1.18/32
+      latte.outputTag: testtag
+      latte.user: system:serviceaccount:latte-gabbi:latte-admin-gabbi
+    creationTimestamp: "2020-06-16T15:55:41Z"
+    labels:
+      spark-app-selector: spark-application-1592322938899
+      spark-exec-id: "3"
+      spark-role: executor
+    name: spatial-spark-26cc9625ccb0362f834ba50405af6879-exec-3
+    namespace: latte-gabbi
+    ownerReferences:
+    - apiVersion: v1
+      controller: true
+      kind: Pod
+      name: spatial-spark
+      uid: 026f48d4-3a68-42fd-b8b0-9c94f00b1f1a
+    resourceVersion: "1372347"
+    selfLink: /api/v1/namespaces/latte-gabbi/pods/spatial-spark-26cc9625ccb0362f834ba50405af6879-exec-3
+    uid: 8d827ee8-91a6-4402-9df5-ed2414d6edcd
+  spec:
+    containers:
+    - args:
+      - executor
+      env:
+      - name: SPARK_DRIVER_URL
+        value: spark://CoarseGrainedScheduler@spatial-spark-26cc9625ccb0362f834ba50405af6879-driver-svc.latte-gabbi.svc:7078
+      - name: SPARK_EXECUTOR_CORES
+        value: "1"
+      - name: SPARK_EXECUTOR_MEMORY
+        value: 1g
+      - name: SPARK_APPLICATION_ID
+        value: spark-application-1592322938899
+      - name: SPARK_EXECUTOR_ID
+        value: "3"
+      - name: SPARK_MOUNTED_CLASSPATH
+        value: /var/spark-data/spark-jars/*
+      - name: SPARK_EXECUTOR_POD_IP
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: status.podIP
+      - name: MDS_ADDR
+      - name: SPARK_MOUNTED_FILES_DIR
+        value: /var/spark-data/spark-files
+      image: spark:v2.3
+      imagePullPolicy: IfNotPresent
+      name: executor
+      ports:
+      - containerPort: 7079
+        name: blockmanager
+        protocol: TCP
+      resources:
+        limits:
+          memory: 1408Mi
+        requests:
+          cpu: "1"
+          memory: 1Gi
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/spark-data/spark-jars
+        name: download-jars-volume
+      - mountPath: /var/spark-data/spark-files
+        name: download-files-volume
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: default-token-b5x52
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    hostname: spatial-spark-26cc9625ccb0362f834ba50405af6879-exec-3
+    initContainers:
+    - args:
+      - init
+      - /etc/spark-init/spark-init.properties
+      image: spark:v2.3
+      imagePullPolicy: IfNotPresent
+      name: spark-init
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /etc/spark-init
+        name: spark-init-properties
+      - mountPath: /var/spark-data/spark-jars
+        name: download-jars-volume
+      - mountPath: /var/spark-data/spark-files
+        name: download-files-volume
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: default-token-b5x52
+        readOnly: true
+    nodeName: compute1.yanzhai-qv73493.trustcloud-pg0.utah.cloudlab.us
+    priority: 0
+    restartPolicy: Never
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - configMap:
+        defaultMode: 420
+        items:
+        - key: spark-init.properties
+          path: spark-init.properties
+        name: spatial-spark-26cc9625ccb0362f834ba50405af6879-init-config
+      name: spark-init-properties
+    - emptyDir: {}
+      name: download-jars-volume
+    - emptyDir: {}
+      name: download-files-volume
+    - name: default-token-b5x52
+      secret:
+        defaultMode: 420
+        secretName: default-token-b5x52
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2020-06-16T15:55:45Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2020-06-16T15:55:46Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2020-06-16T15:55:46Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2020-06-16T15:55:41Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: docker://0d353606bfbef415ccdb65ac32981486d6f153b725d3cebecf26e2ee668b8f1f
+      image: spark:v2.3
+      imageID: docker://sha256:1828b6280b2356d965f4bff2a833d329f55747c4087b7bc71c8173ba97cd56c6
+      lastState: {}
+      name: executor
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2020-06-16T15:55:45Z"
+    hostIP: 128.110.154.21
+    initContainerStatuses:
+    - containerID: docker://131a68dc52a2ef31749761f2552261a33c945b3ae79db90082cdf73cee445102
+      image: spark:v2.3
+      imageID: docker://sha256:1828b6280b2356d965f4bff2a833d329f55747c4087b7bc71c8173ba97cd56c6
+      lastState: {}
+      name: spark-init
+      ready: true
+      restartCount: 0
+      state:
+        terminated:
+          containerID: docker://131a68dc52a2ef31749761f2552261a33c945b3ae79db90082cdf73cee445102
+          exitCode: 0
+          finishedAt: "2020-06-16T15:55:45Z"
+          reason: Completed
+          startedAt: "2020-06-16T15:55:42Z"
+    phase: Running
+    podIP: 192.168.1.18
+    podIPs:
+    - ip: 192.168.1.18
+    qosClass: Burstable
+    startTime: "2020-06-16T15:55:41Z"
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""

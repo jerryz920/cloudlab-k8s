@@ -1,0 +1,1 @@
+curl -XPOST "http://mds:19851/postInstanceConfig" --data-binary "@/tmp/latte-k8s/req.026f48d4-3a68-42fd-b8b0-9c94f00b1f1a__spark-init.json"

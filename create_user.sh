@@ -28,7 +28,7 @@ sudo chown $USER:$GROUP $1.crt
 }
 
 wrap_config() {
-  local master_ip=10.10.2.1
+  local master_ip=10.10.1.1
   sed 's/USERNAME/'$1'/' templates/user_config.yaml > config-$1
   $KUBECTL config --kubeconfig=config-$1 set-cluster kubernetes --server=https://$master_ip:6443 --certificate-authority=/etc/kubernetes/pki/ca.crt --embed-certs=true
   $KUBECTL config --kubeconfig=config-$1 set-credentials $1 --client-certificate=$1.crt --client-key=$1.key --embed-certs=true
@@ -59,7 +59,7 @@ echo "   cp -i config-$USER_TO_CREATE ~/.kube/config"
 echo " Then you can use kubectl to operate on behave of this user."
 echo "##############################################################"
 
-mkdir -p /openstack/home/
+sudo mkdir -p /openstack/home/
 USERHOME=/openstack/home/$USER_TO_CREATE
 sudo useradd -m -d $USERHOME -s /bin/bash $USER_TO_CREATE
 sudo mkdir -p $USERHOME/.kube
