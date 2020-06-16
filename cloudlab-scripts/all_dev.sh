@@ -4,7 +4,7 @@ bash pack.sh # make sure we pack the latest things
 sleep 2
 domain=${1:-utah}
 config=${2:-config}
-user=qiangcao
+user=yanzhai
 grep controller $config > controller
 grep compute $config > compute
 grep network $config > network
@@ -22,8 +22,11 @@ install_one()
   ssh -ttt $user@$addr.$domain.cloudlab.us "
 		sudo mv cloudlab-install.tgz /local/;
 		cd /local;
+		sudo ln -s ~$user /local/home;
 		sudo tar xf cloudlab-install.tgz;
-		sudo bash setup_${nodetype}_dev.sh "
+		sudo bash setup_${nodetype}_dev.sh;
+		sudo chown -R $user ~$user;
+		"
 }
 
 start_install()

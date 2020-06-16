@@ -20,17 +20,14 @@ fi
 #if [ ! -f /root/.ssh/id_rsa ]; then
 #	we will make sure it uses our keys, since this is also used for git access
 #
-	echo 'StrictHostKeyChecking no' >> ~/.ssh/config
+	echo 'StrictHostKeyChecking no' >> /local/home/.ssh/config
 	echo 'StrictHostKeyChecking no' >> /root/.ssh/config
-	chmod 600 ~/.ssh/config
-	chmod 600 /root/.ssh/config
-	cp $SCRIPT_HOME/keys/id_rsa ~/.ssh/id_rsa
-	cp $SCRIPT_HOME/keys/id_rsa.pub ~/.ssh/id_rsa.pub
-	cp $SCRIPT_HOME/keys/id_rsa /root/.ssh/id_rsa
-	cp $SCRIPT_HOME/keys/id_rsa.pub /root/.ssh/id_rsa.pub
-	chmod 600 ~/.ssh/id_rsa
-	chmod 600 /root/.ssh/id_rsa
-	chown -R $USERID ~$USERID/.ssh
+	chmod 600 /local/home/.ssh/config
+	cp $SCRIPT_HOME/keys/id_rsa /local/home/.ssh/id_rsa
+	cp $SCRIPT_HOME/keys/id_rsa.pub /local/home/.ssh/id_rsa.pub
+	cp $SCRIPT_HOME/keys/id_ed25519 /local/home/.ssh/id_25519
+	cp $SCRIPT_HOME/keys/id_ed25519.pub /local/home/.ssh/id_25519.pub
+	chmod 600 /local/home/.ssh/*
 #fi
 
 if [ "$SWAPPER" = "geniuser" ]; then

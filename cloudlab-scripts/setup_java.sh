@@ -4,7 +4,8 @@ sudo add-apt-repository -y ppa:openjdk-r/ppa
 sudo apt-get update
 #echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections
 #sudo apt-get install -y oracle-java8-installer
-sudo apt-get install -y openjdk-8-jdk
+sudo apt-get install -y openjdk-8-jdk=8u162-b12-1 openjdk-8-jre=8u162-b12-1 openjdk-8-jre-headless=8u162-b12-1 openjdk-8-jdk-headless=8u162-b12-1
+
 export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
 echo "export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64" >> /root/.bashrc
 #export JAVA_HOME=/usr/lib/jvm/java-8-oracle

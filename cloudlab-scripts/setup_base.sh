@@ -33,7 +33,7 @@ workaround_partition() {
 if [ $? -eq 0 ]; then
   dev_path=/dev/sda4
 else
-  dev_path=/dev/sdc4
+  dev_path=`sudo fdisk -l | grep nvme0n1p4 | awk '{print $1}'`
 fi
   mkfs.ext4 $dev_path
   mkdir -p $OPENSTACK_DATA_PATH
